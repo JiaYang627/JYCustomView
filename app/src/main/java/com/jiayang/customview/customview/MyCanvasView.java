@@ -16,6 +16,28 @@ import android.view.View;
  * 邮箱   ：JiaYang627@163.com
  */
 public class MyCanvasView extends View {
+    // PointF 用于封存要绘制点 坐标的类 此处为要绘制圆脸的圆心坐标
+    private PointF facePoint = new PointF(340, 400);
+    // 圆脸 圆的半径
+    private int faceRadius = 200;
+
+    private PointF lineHorizontalStartPoint = new PointF(240, 250);
+    private PointF lineHorizontalEndPoint = new PointF(440, 250);
+
+    private PointF lineVerticalStartPoint = new PointF(340, 250);
+    private PointF lineVerticalEndPoint = new PointF(340, 500);
+
+    private PointF lineOtherEndPoint = new PointF(250, 450);
+
+    // 矩形
+    private RectF mouth = new RectF(160, 300, 520, 550);
+
+    private float startAndle = 380f;
+    private float sweepAndle = 140f;
+
+    private PointF leftEyePoint = new PointF(270, 330);
+    private PointF rightEyePoint = new PointF(410, 330);
+    private int eyeRadius = 50;
 
     private Paint mPaint;
 
@@ -47,28 +69,7 @@ public class MyCanvasView extends View {
 
     }
 
-    // PointF 用于封存要绘制点 坐标的类 此处为要绘制圆脸的圆心坐标
-    private PointF facePoint = new PointF(340, 400);
-    // 圆脸 圆的半径
-    private int faceRadius = 200;
 
-    private PointF lineHorizontalStartPoint = new PointF(240, 250);
-    private PointF lineHorizontalEndPoint = new PointF(440, 250);
-
-    private PointF lineVerticalStartPoint = new PointF(340, 250);
-    private PointF lineVerticalEndPoint = new PointF(340, 500);
-
-    private PointF lineOtherEndPoint = new PointF(250, 450);
-
-    // 矩形
-    private RectF mouth = new RectF(160, 300, 520, 550);
-
-    private float startAndle = 380f;
-    private float sweepAndle = 140f;
-
-    private PointF leftEyePoint = new PointF(270, 330);
-    private PointF rightEyePoint = new PointF(410, 330);
-    private int eyeRadius = 50;
 
     @Override
     protected void onDraw(Canvas canvas) {
