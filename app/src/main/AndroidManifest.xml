@@ -20,6 +20,8 @@
         <activity android:name=".customviewactivity.TestCanvasViewActivity"
             android:screenOrientation="portrait"
             />
+        <activity android:name=".customviewactivity.PieChartViewActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

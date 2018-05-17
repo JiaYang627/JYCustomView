@@ -9,12 +9,13 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.jiayang.customview.customviewactivity.PieChartViewActivity;
 import com.jiayang.customview.customviewactivity.TestCanvasViewActivity;
 
 public class MainActivity extends AppCompatActivity {
 
     private ListView mListView;
-    private String[] strings = new String[]{"TestCanvasView"};
+    private String[] strings = new String[]{"TestCanvasView","PieChartView"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent();
                     if (position == 0) {
                         intent.setClass(MainActivity.this, TestCanvasViewActivity.class);
+                    } else if (position == 1) {
+                        intent.setClass(MainActivity.this, PieChartViewActivity.class);
                     }
 
                     startActivity(intent);
