@@ -57,6 +57,7 @@ public class MyPieChartView extends View {
         mLinePaint = new Paint();
         mLinePaint.setColor(Color.BLACK);
         mLinePaint.setAntiAlias(true);
+        mLinePaint.setTextSize(30);
     }
 
     // 当自定义控件的尺寸已经定好的时候  回调此方法
@@ -115,6 +116,18 @@ public class MyPieChartView extends View {
             startAngle += sweepAngle + 2;
             // 每画完一块扇形后，将piepath 重置，否则会将上一块的 画笔 记录携带过来并使用，并不会使用上面的。
             mPiePath.reset();
+
+            String precent = String.format("%.1f", mDatas.get(i).value / 360.0f * 100);
+            precent = precent + "%";
+            // 角度在 90 - 270 之间的 数据 写在 短线的左侧
+            if (startAngle % 360.0f >= 90.0f && startAngle % 360.0f <= 270.0f) {
+                // 通过画笔计算 文字的宽度
+                float textWidth = mLinePaint.measureText(precent);
+                canvas.drawText(precent, endX - textWidth, endY, mLinePaint);
+            } else {
+                canvas.drawText(precent ,endX ,endY ,mLinePaint);
+            }
+
         }
     }
 
