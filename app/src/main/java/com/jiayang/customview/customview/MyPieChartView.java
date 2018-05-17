@@ -2,6 +2,7 @@ package com.jiayang.customview.customview;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -29,6 +30,7 @@ public class MyPieChartView extends View {
     private float totalValue;
     private Path mPiePath;
     private int mRadius;
+    private Paint mLinePaint;
 
     public MyPieChartView(Context context) {
         this(context ,null);
@@ -51,14 +53,17 @@ public class MyPieChartView extends View {
 
         mPiePaint = new Paint();
         mPiePaint.setAntiAlias(true);
+
+        mLinePaint = new Paint();
+        mLinePaint.setColor(Color.BLACK);
+        mLinePaint.setAntiAlias(true);
     }
 
-    // 当自定义控件的尺寸已经定好的时候  回调次方法
-
+    // 当自定义控件的尺寸已经定好的时候  回调此方法
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        Log.e("JY", "onScrollChanged");
+        Log.e("JY", "onSizeChanged");
         this.width = w;
         this.height = h;
         // 为了保证 圆饼图 不会超出屏幕 并保证 外边 数据部分不会遮挡，此处 将 半径定义为 屏幕 的 70%
@@ -99,9 +104,15 @@ public class MyPieChartView extends View {
             mPiePath.arcTo(mPieRectF,startAngle,sweepAngle);
             canvas.drawPath(mPiePath ,mPiePaint);
 
+            // 画 每块扇形区域外的短线 Math.toRadians() 将弧度转换为角度
+            float startX = (float) (mRadius * Math.cos(Math.toRadians(startAngle + sweepAngle / 2)));
+            float startY = (float) (mRadius * Math.sin(Math.toRadians(startAngle + sweepAngle / 2)));
+            float endX = (float) ((mRadius + 30) * Math.cos(Math.toRadians(startAngle + sweepAngle / 2)));
+            float endY = (float) ((mRadius + 30) * Math.sin(Math.toRadians(startAngle + sweepAngle / 2)));
+            canvas.drawLine(startX ,startY ,endX ,endY ,mLinePaint);
+
             // 下一块扇形区域的起点为上一块的终点。
             startAngle += sweepAngle + 2;
-
             // 每画完一块扇形后，将piepath 重置，否则会将上一块的 画笔 记录携带过来并使用，并不会使用上面的。
             mPiePath.reset();
         }

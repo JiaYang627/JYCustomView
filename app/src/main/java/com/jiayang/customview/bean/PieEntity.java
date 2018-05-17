@@ -1,7 +1,9 @@
 package com.jiayang.customview.bean;
 
 /**
- * Created by sszz on 2016/12/9.
+ * @author ：张 奎
+ * @date ：2018-05-17 10：45
+ * 邮箱   ：JiaYang627@163.com
  */
 
 public class PieEntity {
