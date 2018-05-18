@@ -132,12 +132,12 @@ public class MyCircleMenuView extends ViewGroup {
         float y = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                Log.i("test", "ACTION_DOWN");
+                Log.i("JY", "ACTION_DOWN");
                 lastX = x;
                 lastY = y;
                 break;
             case MotionEvent.ACTION_MOVE:
-                Log.i("test", "ACTION_MOVE");
+                Log.i("JY", "ACTION_MOVE");
                 float start = CircleUtil.getAngle(lastX, lastY, distance);
                 float end = CircleUtil.getAngle(x, y, distance);
                 float angle;
@@ -155,7 +155,7 @@ public class MyCircleMenuView extends ViewGroup {
 
                 break;
             case MotionEvent.ACTION_UP:
-                Log.i("test", "ACTION_UP");
+                Log.i("JY", "ACTION_UP");
 
                 break;
         }
