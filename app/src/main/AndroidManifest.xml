@@ -22,6 +22,9 @@
             />
         <activity android:name=".customviewactivity.PieChartViewActivity"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".customviewactivity.CircleMenuViewActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
