@@ -3,12 +3,15 @@ package com.jiayang.customview.customview;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jiayang.customview.R;
+import com.jiayang.customview.utils.CircleUtil;
 
 /**
  * @author ：张 奎
@@ -119,5 +122,44 @@ public class MyCircleMenuView extends ViewGroup {
             addView(view);
         }
 
+    }
+    private float lastX;
+    private float lastY;
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                Log.i("test", "ACTION_DOWN");
+                lastX = x;
+                lastY = y;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                Log.i("test", "ACTION_MOVE");
+                float start = CircleUtil.getAngle(lastX, lastY, distance);
+                float end = CircleUtil.getAngle(x, y, distance);
+                float angle;
+                //判断点击的点所处的象限,如果是1,4象限,角度值是正数,否则是负数
+                if (CircleUtil.getQuadrant(x, y, distance) == 1 || CircleUtil.getQuadrant(x, y, distance) == 4) {
+                    angle = end - start;
+                } else {
+                    angle = start - end;
+                }
+                startAngle += angle;
+                //让界面重新布局和绘制
+                requestLayout();
+                lastX = x;
+                lastY = y;
+
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.i("test", "ACTION_UP");
+
+                break;
+        }
+        //return true 表示当前控件想要处理事件,如果没有其他控件想要处理,则所有的MotionEvent事件都会交给自己处理
+        return true;
     }
 }
