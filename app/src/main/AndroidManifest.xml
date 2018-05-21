@@ -25,6 +25,9 @@
         <activity
             android:name=".customviewactivity.CircleMenuViewActivity"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".customviewactivity.MyNumbersRainViewActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
