@@ -22,6 +22,7 @@ import java.util.List;
  * @author ：张 奎
  * @date ：2018-05-17 10：45
  * 邮箱   ：JiaYang627@163.com
+ * 饼状图
  */
 public class MyPieChartView extends View {
     private List<PieEntity> mDatas;

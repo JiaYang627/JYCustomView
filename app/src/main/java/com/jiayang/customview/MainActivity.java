@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.jiayang.customview.customviewactivity.CircleMenuViewActivity;
+import com.jiayang.customview.customviewactivity.GooViewActivity;
 import com.jiayang.customview.customviewactivity.MyNumbersRainViewActivity;
 import com.jiayang.customview.customviewactivity.PieChartViewActivity;
 import com.jiayang.customview.customviewactivity.TestCanvasViewActivity;
@@ -17,7 +18,7 @@ import com.jiayang.customview.customviewactivity.TestCanvasViewActivity;
 public class MainActivity extends AppCompatActivity {
 
     private ListView mListView;
-    private String[] strings = new String[]{"TestCanvasView","PieChartView","CircleMenuView","NumberRainView"};
+    private String[] strings = new String[]{"TestCanvasView","PieChartView","CircleMenuView","NumberRainView","GooViewActivity"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
                         intent.setClass(MainActivity.this, CircleMenuViewActivity.class);
                     } else if (position == 3) {
                         intent.setClass(MainActivity.this, MyNumbersRainViewActivity.class);
+                    } else if (position == 4) {
+                        intent.setClass(MainActivity.this, GooViewActivity.class);
                     }
 
                     startActivity(intent);

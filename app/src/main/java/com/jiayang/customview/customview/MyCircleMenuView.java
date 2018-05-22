@@ -17,6 +17,7 @@ import com.jiayang.customview.utils.CircleUtil;
  * @author ：张 奎
  * @date ：2018-05-18 13：08
  * 邮箱   ：JiaYang627@163.com
+ * 仿建设银行圆形可滑动菜单
  */
 public class MyCircleMenuView extends ViewGroup {
     private int distance ;
