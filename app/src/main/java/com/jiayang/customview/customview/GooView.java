@@ -10,6 +10,8 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.jiayang.customview.utils.GeometryUtil;
+
 /**
  * @author ：张 奎
  * @date ：2018-05-22 17：35
@@ -40,20 +42,14 @@ public class GooView extends View {
     /**
      * 固定圆 附着点集合
      */
-    private PointF[] stablePoints = new PointF[]{
-            new PointF(300f, 300f),
-            new PointF(300f, 400f)
-    };
+    private PointF[] stablePoints = new PointF[]{};
 
     /**
      * 拖拽圆 附着点集合
      */
-    private PointF[] dragPoints = new PointF[]{
-            new PointF(100f, 300f),
-            new PointF(100f, 400f)
-    };
+    private PointF[] dragPoints = new PointF[]{};
 
-    private PointF controlPoint = new PointF(200f, 350f);
+    private PointF controlPoint ;
     private Path mPath;
 
 
@@ -86,13 +82,29 @@ public class GooView extends View {
         canvas.drawCircle(stableCenter.x ,stableCenter.y ,stableRadius ,mPaint);
         canvas.drawCircle(dragCenter.x, dragCenter.y, dragRadius, mPaint);
 
+        // 计算 固定圆 拖拽圆的附着点 已经 贝塞尔曲线的控制点
+
+        // 计算两个圆圆心连线的斜率
+        float dx = dragCenter.x - stableCenter.x;
+        float dy = dragCenter.y - stableCenter.y;
+        double lineK = 0;
+        if (dx != 0) {
+            lineK = dy / dx;
+        }
+
+        // 计算拖拽圆的两个附着点
+        dragPoints =GeometryUtil.getIntersectionPoints(dragCenter, dragRadius, lineK);
+        stablePoints = GeometryUtil.getIntersectionPoints(stableCenter, stableRadius, lineK);
+        // 计算贝塞尔曲线的控制点 就是两个圆圆心连线的中点
+        controlPoint = GeometryUtil.getMiddlePoint(dragCenter, stableCenter);
+
+
         // 绘制两圆中间的部分
         // 1 移动Path 到固定圆 附着点1
         // 2 附着点1 画贝塞尔曲线到 拖拽圆 附着点1
         // 3 拖拽圆 附着点1 直线 绘制到 拖拽圆 附着点2
         // 4 拖拽圆 附着点2 画贝塞尔曲线 到固定圆 附着点2
         // 5 闭合
-
 
         mPath.moveTo(stablePoints[0].x ,stablePoints[0].y);
 
