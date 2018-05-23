@@ -1,8 +1,8 @@
 package com.jiayang.customview.customviewactivity;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 
 import com.jiayang.customview.R;
 
@@ -11,7 +11,7 @@ import com.jiayang.customview.R;
  * @date ：2018-05-22 17：32
  * 邮箱   ：JiaYang627@163.com
  */
-public class GooViewActivity extends AppCompatActivity {
+public class GooViewActivity extends Activity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
