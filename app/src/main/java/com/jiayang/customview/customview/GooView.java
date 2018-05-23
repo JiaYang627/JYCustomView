@@ -55,12 +55,16 @@ public class GooView extends View {
      * 确定 拖拽幅度最大为200f
      */
     private float maxDragDistance = 200f;
-    
+
     private float minStableRadius = 5f;
 
     private PointF controlPoint;
     private Path mPath;
     private int mStatusBarHeight;
+    /**
+     * 判断 滑动 是否超出规定范围
+     */
+    private boolean isOutOfRange;
 
 
     public GooView(Context context) {
@@ -111,7 +115,6 @@ public class GooView extends View {
         canvas.translate(0, -mStatusBarHeight);
 
 
-
         // 计算 固定圆 拖拽圆 圆心间距离，随着拖拽的距离变大，固定圆的半径变小
         float between2Points = GeometryUtil.getDistanceBetween2Points(dragCenter, stableCenter);
         float percent = between2Points / maxDragDistance;
@@ -122,45 +125,47 @@ public class GooView extends View {
         }
 
 
-        canvas.drawCircle(stableCenter.x, stableCenter.y, changeRadius, mPaint);
         canvas.drawCircle(dragCenter.x, dragCenter.y, dragRadius, mPaint);
+        if (!isOutOfRange) {
 
-        // 计算 固定圆 拖拽圆的附着点 已经 贝塞尔曲线的控制点
+            canvas.drawCircle(stableCenter.x, stableCenter.y, changeRadius, mPaint);
 
-        // 计算两个圆圆心连线的斜率
-        float dx = dragCenter.x - stableCenter.x;
-        float dy = dragCenter.y - stableCenter.y;
-        double lineK = 0;
-        if (dx != 0) {
-            lineK = dy / dx;
+            // 计算 固定圆 拖拽圆的附着点 已经 贝塞尔曲线的控制点
+
+            // 计算两个圆圆心连线的斜率
+            float dx = dragCenter.x - stableCenter.x;
+            float dy = dragCenter.y - stableCenter.y;
+            double lineK = 0;
+            if (dx != 0) {
+                lineK = dy / dx;
+            }
+
+            // 计算拖拽圆的两个附着点
+            dragPoints = GeometryUtil.getIntersectionPoints(dragCenter, dragRadius, lineK);
+            stablePoints = GeometryUtil.getIntersectionPoints(stableCenter, changeRadius, lineK);
+            // 计算贝塞尔曲线的控制点 就是两个圆圆心连线的中点
+            controlPoint = GeometryUtil.getMiddlePoint(dragCenter, stableCenter);
+
+
+            // 绘制两圆中间的部分
+            // 1 移动Path 到固定圆 附着点1
+            // 2 附着点1 画贝塞尔曲线到 拖拽圆 附着点1
+            // 3 拖拽圆 附着点1 直线 绘制到 拖拽圆 附着点2
+            // 4 拖拽圆 附着点2 画贝塞尔曲线 到固定圆 附着点2
+            // 5 闭合
+
+            mPath.moveTo(stablePoints[0].x, stablePoints[0].y);
+
+            mPath.quadTo(controlPoint.x, controlPoint.y, dragPoints[0].x, dragPoints[0].y);
+            mPath.lineTo(dragPoints[1].x, dragPoints[1].y);
+            mPath.quadTo(controlPoint.x, controlPoint.y, stablePoints[1].x, stablePoints[1].y);
+
+            mPath.close();
+
+
+            canvas.drawPath(mPath, mPaint);
+            mPath.reset();
         }
-
-        // 计算拖拽圆的两个附着点
-        dragPoints = GeometryUtil.getIntersectionPoints(dragCenter, dragRadius, lineK);
-        stablePoints = GeometryUtil.getIntersectionPoints(stableCenter, changeRadius, lineK);
-        // 计算贝塞尔曲线的控制点 就是两个圆圆心连线的中点
-        controlPoint = GeometryUtil.getMiddlePoint(dragCenter, stableCenter);
-
-
-        // 绘制两圆中间的部分
-        // 1 移动Path 到固定圆 附着点1
-        // 2 附着点1 画贝塞尔曲线到 拖拽圆 附着点1
-        // 3 拖拽圆 附着点1 直线 绘制到 拖拽圆 附着点2
-        // 4 拖拽圆 附着点2 画贝塞尔曲线 到固定圆 附着点2
-        // 5 闭合
-
-        mPath.moveTo(stablePoints[0].x, stablePoints[0].y);
-
-        mPath.quadTo(controlPoint.x, controlPoint.y, dragPoints[0].x, dragPoints[0].y);
-        mPath.lineTo(dragPoints[1].x, dragPoints[1].y);
-        mPath.quadTo(controlPoint.x, controlPoint.y, stablePoints[1].x, stablePoints[1].y);
-
-        mPath.close();
-
-
-        canvas.drawPath(mPath, mPaint);
-        mPath.reset();
-
         canvas.restore();
     }
 
@@ -171,13 +176,17 @@ public class GooView extends View {
             case MotionEvent.ACTION_DOWN:
                 float rawX = event.getRawX();
                 float rawY = event.getRawY();
-                dragCenter.set(rawX ,rawY);
+                dragCenter.set(rawX, rawY);
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
                 rawX = event.getRawX();
                 rawY = event.getRawY();
-                dragCenter.set(rawX ,rawY);
+                dragCenter.set(rawX, rawY);
+                float points = GeometryUtil.getDistanceBetween2Points(dragCenter, stableCenter);
+                if (points > maxDragDistance) {
+                    isOutOfRange = true;
+                }
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
