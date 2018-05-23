@@ -51,6 +51,13 @@ public class GooView extends View {
      */
     private PointF[] dragPoints = new PointF[]{};
 
+    /**
+     * 确定 拖拽幅度最大为200f
+     */
+    private float maxDragDistance = 200f;
+    
+    private float minStableRadius = 5f;
+
     private PointF controlPoint;
     private Path mPath;
     private int mStatusBarHeight;
@@ -103,7 +110,19 @@ public class GooView extends View {
         canvas.save();
         canvas.translate(0, -mStatusBarHeight);
 
-        canvas.drawCircle(stableCenter.x, stableCenter.y, stableRadius, mPaint);
+
+
+        // 计算 固定圆 拖拽圆 圆心间距离，随着拖拽的距离变大，固定圆的半径变小
+        float between2Points = GeometryUtil.getDistanceBetween2Points(dragCenter, stableCenter);
+        float percent = between2Points / maxDragDistance;
+        // 随着拖拽距离的百分比变大 固定圆 半径也百分比减小
+        float changeRadius = GeometryUtil.evaluateValue(percent, stableRadius, minStableRadius);
+        if (changeRadius < minStableRadius) {
+            changeRadius = minStableRadius;
+        }
+
+
+        canvas.drawCircle(stableCenter.x, stableCenter.y, changeRadius, mPaint);
         canvas.drawCircle(dragCenter.x, dragCenter.y, dragRadius, mPaint);
 
         // 计算 固定圆 拖拽圆的附着点 已经 贝塞尔曲线的控制点
@@ -118,7 +137,7 @@ public class GooView extends View {
 
         // 计算拖拽圆的两个附着点
         dragPoints = GeometryUtil.getIntersectionPoints(dragCenter, dragRadius, lineK);
-        stablePoints = GeometryUtil.getIntersectionPoints(stableCenter, stableRadius, lineK);
+        stablePoints = GeometryUtil.getIntersectionPoints(stableCenter, changeRadius, lineK);
         // 计算贝塞尔曲线的控制点 就是两个圆圆心连线的中点
         controlPoint = GeometryUtil.getMiddlePoint(dragCenter, stableCenter);
 
