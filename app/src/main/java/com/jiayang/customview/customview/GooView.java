@@ -1,5 +1,6 @@
 package com.jiayang.customview.customview;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 
 import com.jiayang.customview.utils.GeometryUtil;
 
@@ -65,6 +67,10 @@ public class GooView extends View {
      * 判断 滑动 是否超出规定范围
      */
     private boolean isOutOfRange;
+    /**
+     * 抬起的时候 超出规定范围
+     */
+    private boolean isDisappear;
 
 
     public GooView(Context context) {
@@ -124,47 +130,50 @@ public class GooView extends View {
             changeRadius = minStableRadius;
         }
 
+        if (!isDisappear) {
 
-        canvas.drawCircle(dragCenter.x, dragCenter.y, dragRadius, mPaint);
-        if (!isOutOfRange) {
 
-            canvas.drawCircle(stableCenter.x, stableCenter.y, changeRadius, mPaint);
+            canvas.drawCircle(dragCenter.x, dragCenter.y, dragRadius, mPaint);
+            if (!isOutOfRange) {
 
-            // 计算 固定圆 拖拽圆的附着点 已经 贝塞尔曲线的控制点
+                canvas.drawCircle(stableCenter.x, stableCenter.y, changeRadius, mPaint);
 
-            // 计算两个圆圆心连线的斜率
-            float dx = dragCenter.x - stableCenter.x;
-            float dy = dragCenter.y - stableCenter.y;
-            double lineK = 0;
-            if (dx != 0) {
-                lineK = dy / dx;
+                // 计算 固定圆 拖拽圆的附着点 已经 贝塞尔曲线的控制点
+
+                // 计算两个圆圆心连线的斜率
+                float dx = dragCenter.x - stableCenter.x;
+                float dy = dragCenter.y - stableCenter.y;
+                double lineK = 0;
+                if (dx != 0) {
+                    lineK = dy / dx;
+                }
+
+                // 计算拖拽圆的两个附着点
+                dragPoints = GeometryUtil.getIntersectionPoints(dragCenter, dragRadius, lineK);
+                stablePoints = GeometryUtil.getIntersectionPoints(stableCenter, changeRadius, lineK);
+                // 计算贝塞尔曲线的控制点 就是两个圆圆心连线的中点
+                controlPoint = GeometryUtil.getMiddlePoint(dragCenter, stableCenter);
+
+
+                // 绘制两圆中间的部分
+                // 1 移动Path 到固定圆 附着点1
+                // 2 附着点1 画贝塞尔曲线到 拖拽圆 附着点1
+                // 3 拖拽圆 附着点1 直线 绘制到 拖拽圆 附着点2
+                // 4 拖拽圆 附着点2 画贝塞尔曲线 到固定圆 附着点2
+                // 5 闭合
+
+                mPath.moveTo(stablePoints[0].x, stablePoints[0].y);
+
+                mPath.quadTo(controlPoint.x, controlPoint.y, dragPoints[0].x, dragPoints[0].y);
+                mPath.lineTo(dragPoints[1].x, dragPoints[1].y);
+                mPath.quadTo(controlPoint.x, controlPoint.y, stablePoints[1].x, stablePoints[1].y);
+
+                mPath.close();
+
+
+                canvas.drawPath(mPath, mPaint);
+                mPath.reset();
             }
-
-            // 计算拖拽圆的两个附着点
-            dragPoints = GeometryUtil.getIntersectionPoints(dragCenter, dragRadius, lineK);
-            stablePoints = GeometryUtil.getIntersectionPoints(stableCenter, changeRadius, lineK);
-            // 计算贝塞尔曲线的控制点 就是两个圆圆心连线的中点
-            controlPoint = GeometryUtil.getMiddlePoint(dragCenter, stableCenter);
-
-
-            // 绘制两圆中间的部分
-            // 1 移动Path 到固定圆 附着点1
-            // 2 附着点1 画贝塞尔曲线到 拖拽圆 附着点1
-            // 3 拖拽圆 附着点1 直线 绘制到 拖拽圆 附着点2
-            // 4 拖拽圆 附着点2 画贝塞尔曲线 到固定圆 附着点2
-            // 5 闭合
-
-            mPath.moveTo(stablePoints[0].x, stablePoints[0].y);
-
-            mPath.quadTo(controlPoint.x, controlPoint.y, dragPoints[0].x, dragPoints[0].y);
-            mPath.lineTo(dragPoints[1].x, dragPoints[1].y);
-            mPath.quadTo(controlPoint.x, controlPoint.y, stablePoints[1].x, stablePoints[1].y);
-
-            mPath.close();
-
-
-            canvas.drawPath(mPath, mPaint);
-            mPath.reset();
         }
         canvas.restore();
     }
@@ -190,6 +199,38 @@ public class GooView extends View {
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
+                points = GeometryUtil.getDistanceBetween2Points(dragCenter, stableCenter);
+                // 抬起的时候 判断到 移动过程中超出过 最大距离
+                if (isOutOfRange) {
+                    // 抬起的时候 离开点超过 最大距离
+                    if (points > maxDragDistance) {
+                        isDisappear = true;
+                    } else {
+                        dragCenter.set(stableCenter.x, stableCenter.y);
+                    }
+
+                } else {
+                    final PointF pointF = new PointF(dragCenter.x, dragCenter.y);
+                    // 从参数一移动到参数二
+                    ValueAnimator va = ValueAnimator.ofFloat(points, 0);
+                    va.setDuration(1500);
+                    // 动画设置 延长动效
+                    va.setInterpolator(new OvershootInterpolator(3));
+                    va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            // 获取动画变化的百分比
+                            float animatedFraction = animation.getAnimatedFraction();
+                            // 根据百分比 进行 拖拽圆圆心的变化
+                            dragCenter = GeometryUtil.getPointByPercent(pointF, stableCenter, animatedFraction);
+                            invalidate();
+                        }
+                    });
+                    va.start();
+
+
+                }
+                invalidate();
                 break;
         }
 
