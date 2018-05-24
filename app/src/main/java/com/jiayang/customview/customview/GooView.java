@@ -40,7 +40,7 @@ public class GooView extends View {
     /**
      * 拖拽圆半径
      */
-    private float dragRadius = 30f;
+    private float dragRadius = 20f;
 
 
     /**
@@ -72,6 +72,9 @@ public class GooView extends View {
      */
     private boolean isDisappear;
 
+    private Rect mTextRect;
+    private String mText ="";
+
 
     public GooView(Context context) {
         this(context, null);
@@ -90,8 +93,15 @@ public class GooView extends View {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setColor(Color.RED);
+        mPaint.setTextSize(25);
+
+        mTextRect = new Rect();
 
         mPath = new Path();
+    }
+
+    public void setText(String text) {
+        mText = text;
     }
 
     /**
@@ -132,11 +142,7 @@ public class GooView extends View {
 
         if (!isDisappear) {
 
-
-            canvas.drawCircle(dragCenter.x, dragCenter.y, dragRadius, mPaint);
             if (!isOutOfRange) {
-
-                canvas.drawCircle(stableCenter.x, stableCenter.y, changeRadius, mPaint);
 
                 // 计算 固定圆 拖拽圆的附着点 已经 贝塞尔曲线的控制点
 
@@ -173,9 +179,23 @@ public class GooView extends View {
 
                 canvas.drawPath(mPath, mPaint);
                 mPath.reset();
+
+                canvas.drawCircle(stableCenter.x, stableCenter.y, changeRadius, mPaint);
             }
+            canvas.drawCircle(dragCenter.x, dragCenter.y, dragRadius, mPaint);
+            drawText(canvas);
         }
         canvas.restore();
+    }
+
+    private void drawText(Canvas canvas) {
+        mPaint.setColor(Color.WHITE);
+        // 画文字的时候 文字的起始点在左下角。
+        mPaint.getTextBounds(mText, 0, mText.length(), mTextRect);
+        float x = dragCenter.x - mTextRect.width() * 0.5f;
+        float y = dragCenter.y + mTextRect.height() * 0.5f;
+        canvas.drawText(mText ,x ,y ,mPaint);
+        mPaint.setColor(Color.RED);
     }
 
     @Override
