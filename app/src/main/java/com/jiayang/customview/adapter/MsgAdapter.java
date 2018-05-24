@@ -1,5 +1,6 @@
 package com.jiayang.customview.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import com.jiayang.customview.R;
 import com.jiayang.customview.bean.Msg;
+import com.jiayang.customview.listener.onUnReadMsgTouchListener;
 
 import java.util.List;
 
@@ -18,8 +20,10 @@ import java.util.List;
 
 public class MsgAdapter extends Adapter<MsgAdapter.MyViewHolder> {
 	private List<Msg> msgList;
+	private final onUnReadMsgTouchListener mMsgTouchListener;
 
-	public MsgAdapter(List<Msg> msgList) {
+	public MsgAdapter(List<Msg> msgList, Context context) {
+		mMsgTouchListener = new onUnReadMsgTouchListener(context);
 		this.msgList = msgList;
 	}
 
@@ -37,8 +41,11 @@ public class MsgAdapter extends Adapter<MsgAdapter.MyViewHolder> {
 			holder.tv_unReadMsgCount.setVisibility(View.INVISIBLE);
 		} else {
 			holder.tv_unReadMsgCount.setVisibility(View.VISIBLE);
-			holder.tv_unReadMsgCount.setText(unReadMsgCount+"");
+			holder.tv_unReadMsgCount.setText(String.valueOf(unReadMsgCount));
+
 		}
+
+		holder.tv_unReadMsgCount.setOnTouchListener(mMsgTouchListener);
 	}
 
 	@Override

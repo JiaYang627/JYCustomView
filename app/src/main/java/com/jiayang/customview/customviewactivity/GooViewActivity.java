@@ -30,7 +30,7 @@ public class GooViewActivity extends Activity {
         initData();
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(new MsgAdapter(mMsgList));
+        mRecyclerView.setAdapter(new MsgAdapter(mMsgList ,this));
 
 
     }

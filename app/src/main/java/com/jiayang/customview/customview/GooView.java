@@ -1,5 +1,7 @@
 package com.jiayang.customview.customview;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -10,6 +12,7 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
@@ -36,11 +39,11 @@ public class GooView extends View {
     /**
      * 固定圆半径
      */
-    private float stableRadius = 20f;
+    private float stableRadius = 25f;
     /**
      * 拖拽圆半径
      */
-    private float dragRadius = 20f;
+    private float dragRadius = 25f;
 
 
     /**
@@ -90,6 +93,7 @@ public class GooView extends View {
     }
 
     private void init() {
+        Log.e("JY", "init --");
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setColor(Color.RED);
@@ -101,7 +105,15 @@ public class GooView extends View {
     }
 
     public void setText(String text) {
+        Log.e("JY", "setText --");
         mText = text;
+    }
+
+    public void initDownPoints(float x, float y) {
+        Log.e("JY", "initDownPoints --");
+        dragCenter.set(x, y);
+        stableCenter.set(x, y);
+        invalidate();
     }
 
     /**
@@ -121,12 +133,14 @@ public class GooView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         mStatusBarHeight = getStatusBarHeight(this);
+        Log.e("JY", "onSizeChanged --");
 
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        Log.e("JY", "onDraw --");
         canvas.save();
         canvas.translate(0, -mStatusBarHeight);
 
@@ -198,11 +212,31 @@ public class GooView extends View {
         mPaint.setColor(Color.RED);
     }
 
+    public interface onGooViewChangeListener {
+        /**
+         * 移除
+         */
+        void onDisappear();
+
+        /**
+         * 重置
+         */
+        void onReset();
+    }
+
+    private onGooViewChangeListener mListener;
+
+    public void setonGooViewChangeListener(onGooViewChangeListener listener) {
+        this.mListener = listener;
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                isOutOfRange = false;
+                isDisappear=false;
                 float rawX = event.getRawX();
                 float rawY = event.getRawY();
                 dragCenter.set(rawX, rawY);
@@ -225,8 +259,12 @@ public class GooView extends View {
                     // 抬起的时候 离开点超过 最大距离
                     if (points > maxDragDistance) {
                         isDisappear = true;
+                        if (mListener != null) {
+                            mListener.onDisappear();
+                        }
                     } else {
                         dragCenter.set(stableCenter.x, stableCenter.y);
+                        mListener.onReset();
                     }
 
                 } else {
@@ -236,6 +274,13 @@ public class GooView extends View {
                     va.setDuration(1500);
                     // 动画设置 延长动效
                     va.setInterpolator(new OvershootInterpolator(3));
+                    va.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            mListener.onReset();
+                        }
+                    });
                     va.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                         @Override
                         public void onAnimationUpdate(ValueAnimator animation) {
