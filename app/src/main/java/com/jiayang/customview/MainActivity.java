@@ -18,7 +18,7 @@ import com.jiayang.customview.customviewactivity.TestCanvasViewActivity;
 public class MainActivity extends AppCompatActivity {
 
     private ListView mListView;
-    private String[] strings = new String[]{"TestCanvasView","PieChartView","CircleMenuView","NumberRainView","GooViewActivity"};
+    private String[] strings = new String[]{"CanvasTestView","PieChartView","CircleMenuView","NumberRainView","GooView"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
