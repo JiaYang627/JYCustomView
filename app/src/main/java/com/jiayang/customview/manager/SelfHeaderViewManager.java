@@ -65,12 +65,13 @@ public class SelfHeaderViewManager {
         mImageView.startAnimation(mRotateAnimationForDown);
     }
 
-    public void changeToRefreshing() {
+    public void changeToReleaseRefresh() {
         mTextView.setText("释放刷新");
         mImageView.startAnimation(mRotateAnimationForUp);
+
     }
 
-    public void changeToRefreshEnd() {
+    public void changeToRefreshing() {
 
     }
 }

@@ -1,5 +1,6 @@
 package com.jiayang.customview.customview;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
@@ -32,6 +33,7 @@ public class MyPullToRefreshView extends LinearLayout {
     private float maxWholeHeaderViewPaddingTopRadio = 0.3f;
     private float mDownY;
     private double dragRadio = 1.8f;
+
     //静止,下拉,释放刷新,刷新
     //枚举:
     //枚举不占用任何实际的值
@@ -84,8 +86,8 @@ public class MyPullToRefreshView extends LinearLayout {
             if (paddingTop < 0 && currentStatus != RefreshStatus.PULL_DOWN) {
                 currentStatus = RefreshStatus.PULL_DOWN;
                 handleRefreshStatusChanged();
-            } else if (paddingTop > 0 && currentStatus != RefreshStatus.REFRESHING) {
-                currentStatus = RefreshStatus.REFRESHING;
+            } else if (paddingTop > 0 && currentStatus != RefreshStatus.RELEASE_REFRESH) {
+                currentStatus = RefreshStatus.RELEASE_REFRESH;
                 handleRefreshStatusChanged();
             }
             //判断如果paddingtop>maxWholeHeaderViewPaddingTop,就不能再滑动了
@@ -111,13 +113,36 @@ public class MyPullToRefreshView extends LinearLayout {
             case PULL_DOWN:
                 mSelfManager.changeToPullDown();
                 break;
+            case RELEASE_REFRESH:
+                mSelfManager.changeToReleaseRefresh();
+                break;
             case REFRESHING:
                 mSelfManager.changeToRefreshing();
                 break;
-            case RELEASE_REFRESH:
-                mSelfManager.changeToRefreshEnd();
-                break;
         }
+
+    }
+
+    private boolean handleActionUp(MotionEvent event) {
+        mDownY = 0;
+        if (currentStatus == RefreshStatus.PULL_DOWN) {
+            hiddenRefreshHeaderView();
+        }
+
+        return mWholeHeaderView.getPaddingTop() > minWholeHeaderViewPaddingTop;
+    }
+
+    private void hiddenRefreshHeaderView() {
+        ValueAnimator valueAnimator = ValueAnimator.ofInt(mWholeHeaderView.getPaddingTop(), minWholeHeaderViewPaddingTop);
+        valueAnimator.setDuration(500);
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int currentPaddingTop = (int) animation.getAnimatedValue();
+                mWholeHeaderView.setPadding(0, currentPaddingTop, 0, 0);
+            }
+        });
+        valueAnimator.start();
 
     }
 
@@ -134,9 +159,14 @@ public class MyPullToRefreshView extends LinearLayout {
                 }
                 break;
             case MotionEvent.ACTION_UP:
+                if (handleActionUp(event)) {
+                    return true;
+                }
                 break;
         }
 
         return super.onTouchEvent(event);
     }
+
+
 }
