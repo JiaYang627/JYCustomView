@@ -1,6 +1,7 @@
 package com.jiayang.customview.manager;
 
 import android.content.Context;
+import android.graphics.drawable.AnimationDrawable;
 import android.view.View;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
@@ -22,6 +23,8 @@ public class SelfHeaderViewManager {
     private RotateAnimation mRotateAnimationForDown;
     private TextView mTextView;
     private ImageView mImageView;
+    private ImageView mImageViewAnimation;
+    private AnimationDrawable mMImageViewDrawable;
 
     public SelfHeaderViewManager(Context context) {
         mContext = context;
@@ -41,8 +44,10 @@ public class SelfHeaderViewManager {
     public View getSelfHeaderView() {
         if (mSelfHeaderView == null) {
             mSelfHeaderView = View.inflate(mContext, R.layout.view_refresh_header_normal, null);
-            mTextView = (TextView) mSelfHeaderView.findViewById(R.id.tv_normal_refresh_header_status);
-            mImageView = (ImageView) mSelfHeaderView.findViewById(R.id.iv_normal_refresh_header_arrow);
+            mTextView =  mSelfHeaderView.findViewById(R.id.tv_normal_refresh_header_status);
+            mImageView =  mSelfHeaderView.findViewById(R.id.iv_normal_refresh_header_arrow);
+            mImageViewAnimation =  mSelfHeaderView.findViewById(R.id.iv_normal_refresh_header_chrysanthemum);
+            mMImageViewDrawable = (AnimationDrawable) mImageViewAnimation.getDrawable();
             mSelfHeaderView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT));
         }
 
@@ -72,6 +77,10 @@ public class SelfHeaderViewManager {
     }
 
     public void changeToRefreshing() {
-
+        mTextView.setText("加载中......");
+        mImageView.clearAnimation();
+        mImageView.setVisibility(View.GONE);
+        mImageViewAnimation.setVisibility(View.VISIBLE);
+        mMImageViewDrawable.start();
     }
 }

@@ -126,7 +126,12 @@ public class MyPullToRefreshView extends LinearLayout {
     private boolean handleActionUp(MotionEvent event) {
         mDownY = 0;
         if (currentStatus == RefreshStatus.PULL_DOWN) {
+            currentStatus = RefreshStatus.IDLE;
             hiddenRefreshHeaderView();
+        } else if (currentStatus == RefreshStatus.RELEASE_REFRESH) {
+            currentStatus = RefreshStatus.REFRESHING;
+            changeRefreshHeaderViewPaddingToZero();
+            handleRefreshStatusChanged();
         }
 
         return mWholeHeaderView.getPaddingTop() > minWholeHeaderViewPaddingTop;
@@ -144,6 +149,19 @@ public class MyPullToRefreshView extends LinearLayout {
         });
         valueAnimator.start();
 
+    }
+
+    private void changeRefreshHeaderViewPaddingToZero() {
+        ValueAnimator valueAnimator = ValueAnimator.ofInt(mWholeHeaderView.getPaddingTop(), 0);
+        valueAnimator.setDuration(500);
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int currentPaddingTop = (int) animation.getAnimatedValue();
+                mWholeHeaderView.setPadding(0, currentPaddingTop, 0, 0);
+            }
+        });
+        valueAnimator.start();
     }
 
     @Override
