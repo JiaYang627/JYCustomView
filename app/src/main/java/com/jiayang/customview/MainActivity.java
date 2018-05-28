@@ -13,12 +13,13 @@ import com.jiayang.customview.customviewactivity.CircleMenuViewActivity;
 import com.jiayang.customview.customviewactivity.GooViewActivity;
 import com.jiayang.customview.customviewactivity.MyNumbersRainViewActivity;
 import com.jiayang.customview.customviewactivity.PieChartViewActivity;
+import com.jiayang.customview.customviewactivity.PullToRefreshViewActivity;
 import com.jiayang.customview.customviewactivity.TestCanvasViewActivity;
 
 public class MainActivity extends AppCompatActivity {
 
     private ListView mListView;
-    private String[] strings = new String[]{"CanvasTestView","PieChartView","CircleMenuView","NumberRainView","GooView"};
+    private String[] strings = new String[]{"CanvasTestView","PieChartView","CircleMenuView","NumberRainView","GooView","PullToRefreshView"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
                         intent.setClass(MainActivity.this, MyNumbersRainViewActivity.class);
                     } else if (position == 4) {
                         intent.setClass(MainActivity.this, GooViewActivity.class);
+                    } else if (position == 5) {
+                        intent.setClass(MainActivity.this, PullToRefreshViewActivity.class);
                     }
 
                     startActivity(intent);
