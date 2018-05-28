@@ -83,8 +83,10 @@ public class MyPullToRefreshView extends LinearLayout {
             int paddingTop = (int) (dY / dragRadio + minWholeHeaderViewPaddingTop);
             if (paddingTop < 0 && currentStatus != RefreshStatus.PULL_DOWN) {
                 currentStatus = RefreshStatus.PULL_DOWN;
+                handleRefreshStatusChanged();
             } else if (paddingTop > 0 && currentStatus != RefreshStatus.REFRESHING) {
                 currentStatus = RefreshStatus.REFRESHING;
+                handleRefreshStatusChanged();
             }
             //判断如果paddingtop>maxWholeHeaderViewPaddingTop,就不能再滑动了
             paddingTop = Math.min(paddingTop, maxWholeHeaderViewPaddingTop);
@@ -96,6 +98,27 @@ public class MyPullToRefreshView extends LinearLayout {
 
 
         return false;
+    }
+
+    /**
+     * 刷新状态发生变化
+     */
+    private void handleRefreshStatusChanged() {
+        switch (currentStatus) {
+            case IDLE:
+                mSelfManager.changeToIdle();
+                break;
+            case PULL_DOWN:
+                mSelfManager.changeToPullDown();
+                break;
+            case REFRESHING:
+                mSelfManager.changeToRefreshing();
+                break;
+            case RELEASE_REFRESH:
+                mSelfManager.changeToRefreshEnd();
+                break;
+        }
+
     }
 
     @Override
