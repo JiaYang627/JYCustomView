@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.jiayang.customview.R;
+import com.jiayang.customview.customview.MyPullToRefreshView;
+import com.jiayang.customview.manager.SelfHeaderViewManager;
 
 /**
  * @author ：张 奎
@@ -14,9 +16,17 @@ import com.jiayang.customview.R;
  */
 public class PullToRefreshViewActivity extends AppCompatActivity {
 
+    private MyPullToRefreshView mPullToRefreshView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pulltorefresh);
+        initView();
+    }
+
+    private void initView() {
+        mPullToRefreshView = findViewById(R.id.myPullToRefreshView);
+        mPullToRefreshView.setSelfManager(new SelfHeaderViewManager(this));
     }
 }
