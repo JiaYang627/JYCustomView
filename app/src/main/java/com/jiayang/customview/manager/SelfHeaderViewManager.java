@@ -15,7 +15,7 @@ import android.widget.TextView;
 public abstract class SelfHeaderViewManager {
 
     protected Context mContext;
-    private View mSelfHeaderView;
+    protected View mSelfHeaderView;
     private RotateAnimation mRotateAnimationForUp;
     private RotateAnimation mRotateAnimationForDown;
     private TextView mTextView;

@@ -17,7 +17,6 @@ import com.jiayang.customview.R;
  */
 public class NormalSelfHeaderViewManager extends SelfHeaderViewManager{
 
-    private View mSelfHeaderView;
     private RotateAnimation mRotateAnimationForUp;
     private RotateAnimation mRotateAnimationForDown;
     private TextView mTextView;
@@ -53,12 +52,6 @@ public class NormalSelfHeaderViewManager extends SelfHeaderViewManager{
         return mSelfHeaderView;
     }
 
-    public int getSelfHeaderViewHeight() {
-        // 此时 视图还是初始化阶段，并没有到测量阶段，如果此时想获取到视图的宽高，只需要调用measure方法，
-        // 并传入 0,0 即可
-        mSelfHeaderView.measure(0, 0);
-        return mSelfHeaderView.getMeasuredHeight();
-    }
 
     public void changeToIdle() {
 
