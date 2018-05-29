@@ -8,8 +8,10 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -36,8 +38,9 @@ public class MyPullToRefreshView extends LinearLayout {
     private float maxWholeHeaderViewPaddingTopRadio = 0.3f;
     private float mDownY;
     private double dragRadio = 1.8f;
-    private RecyclerView recyclerView;
-    private ScrollView scrollView;
+    private RecyclerView mRecyclerView;
+    private ScrollView mScrollView;
+    private ListView mListView;
 
     //静止,下拉,释放刷新,刷新
     //枚举:
@@ -236,9 +239,11 @@ public class MyPullToRefreshView extends LinearLayout {
         super.onFinishInflate();
         View contentView = getChildAt(1);
         if (contentView instanceof RecyclerView) {
-            this.recyclerView = (RecyclerView) contentView;
+            this.mRecyclerView = (RecyclerView) contentView;
         } else if (contentView instanceof ScrollView) {
-            this.scrollView = (ScrollView) contentView;
+            this.mScrollView = (ScrollView) contentView;
+        } else if (contentView instanceof AbsListView) {
+            this.mListView = (ListView) contentView;
         }
     }
     /**
@@ -247,10 +252,13 @@ public class MyPullToRefreshView extends LinearLayout {
      * @return
      */
     private boolean handleRefresh() {
-        if (RefreshScrollingUtil.isScrollViewOrWebViewToTop(scrollView)) {
+        if (RefreshScrollingUtil.isScrollViewOrWebViewToTop(mScrollView)) {
             return true;
         }
-        if (RefreshScrollingUtil.isRecyclerViewToTop(recyclerView)) {
+        if (RefreshScrollingUtil.isRecyclerViewToTop(mRecyclerView)) {
+            return true;
+        }
+        if (RefreshScrollingUtil.isAbsListViewToTop(mListView)) {
             return true;
         }
         return false;
