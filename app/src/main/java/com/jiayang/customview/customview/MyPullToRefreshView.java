@@ -4,14 +4,17 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.jiayang.customview.manager.SelfHeaderViewManager;
+import com.jiayang.customview.utils.RefreshScrollingUtil;
 
 /**
  * @author ：张 奎
@@ -33,8 +36,8 @@ public class MyPullToRefreshView extends LinearLayout {
     private float maxWholeHeaderViewPaddingTopRadio = 0.3f;
     private float mDownY;
     private double dragRadio = 1.8f;
-
-
+    private RecyclerView recyclerView;
+    private ScrollView scrollView;
 
     //静止,下拉,释放刷新,刷新
     //枚举:
@@ -85,6 +88,12 @@ public class MyPullToRefreshView extends LinearLayout {
             return false;
         }
 
+        // 此时 当前自定义View 会和 下面的子View：RecyclerView  和 ListView 事件冲突，
+        // 一 当前 View 写了 onInterceptTouchEvent 后不会处理当前View 的 down 事件，所以mDownY 会记录不下来
+        // 二 在up 的时候 mDownY 又会记录上次down 的时候 也就是此处的mDownY，会造成滑动偏移量计算错误，所以在up 的时候 mDownY 致为 0即可。
+        if (mDownY == 0) {
+            mDownY = event.getY();
+        }
         float moveY = event.getY();
         float dY = moveY - mDownY;
         if (dY > 0) {
@@ -131,6 +140,7 @@ public class MyPullToRefreshView extends LinearLayout {
     }
 
     private boolean handleActionUp(MotionEvent event) {
+        // 在up 的时候 mDownY 又会记录上次down 的时候 也就是此处的mDownY，会造成滑动偏移量计算错误，所以在up 的时候 mDownY 致为 0即可。
         mDownY = 0;
         if (currentStatus == RefreshStatus.PULL_DOWN) {
             currentStatus = RefreshStatus.IDLE;
@@ -189,6 +199,61 @@ public class MyPullToRefreshView extends LinearLayout {
         hiddenRefreshHeaderView();
         currentStatus = RefreshStatus.IDLE;
         mSelfManager.onRefreshEnd();
+    }
+
+    private int mInterceptDownY;
+    private int mInterceptDownX;
+
+    // 事件分发拦截
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mInterceptDownX = (int) ev.getX();
+                mInterceptDownY = (int) ev.getY();
+
+                break;
+            case MotionEvent.ACTION_MOVE:
+                float dY = ev.getY() - mInterceptDownY;
+                // 说明 此时 move的时候  Y轴距离 大于 X 轴的距离
+                if (Math.abs(ev.getX() - mInterceptDownX) < Math.abs(dY)) {
+                    if (dY > 0 && handleRefresh()) {
+                        return true;
+                    }
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+
+                break;
+        }
+
+        return super.onInterceptTouchEvent(ev);
+    }
+
+    //当前控件及其子控件全部加载完成的时候的回调
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        View contentView = getChildAt(1);
+        if (contentView instanceof RecyclerView) {
+            this.recyclerView = (RecyclerView) contentView;
+        } else if (contentView instanceof ScrollView) {
+            this.scrollView = (ScrollView) contentView;
+        }
+    }
+    /**
+     * 判断是否可以处理刷新操作,其实就是判断滚动视图是否到达顶部
+     *
+     * @return
+     */
+    private boolean handleRefresh() {
+        if (RefreshScrollingUtil.isScrollViewOrWebViewToTop(scrollView)) {
+            return true;
+        }
+        if (RefreshScrollingUtil.isRecyclerViewToTop(recyclerView)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
