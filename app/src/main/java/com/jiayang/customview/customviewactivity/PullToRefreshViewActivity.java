@@ -23,10 +23,25 @@ public class PullToRefreshViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pulltorefresh);
         initView();
+        initListener();
     }
 
     private void initView() {
         mPullToRefreshView = findViewById(R.id.myPullToRefreshView);
         mPullToRefreshView.setSelfManager(new SelfHeaderViewManager(this));
+    }
+
+    private void initListener() {
+        mPullToRefreshView.setOnRefreshEndListener(new MyPullToRefreshView.onRefreshEndListener() {
+            @Override
+            public void endRefresh() {
+                mPullToRefreshView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mPullToRefreshView.onRefreshEnd();
+                    }
+                }, 2000);
+            }
+        });
     }
 }

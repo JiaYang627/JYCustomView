@@ -34,6 +34,8 @@ public class MyPullToRefreshView extends LinearLayout {
     private float mDownY;
     private double dragRadio = 1.8f;
 
+
+
     //静止,下拉,释放刷新,刷新
     //枚举:
     //枚举不占用任何实际的值
@@ -78,6 +80,11 @@ public class MyPullToRefreshView extends LinearLayout {
     }
 
     private boolean handleActionMove(MotionEvent event) {
+        // 如果此时 状态为 加载中，是不可以move的
+        if (currentStatus == RefreshStatus.REFRESHING) {
+            return false;
+        }
+
         float moveY = event.getY();
         float dY = moveY - mDownY;
         if (dY > 0) {
@@ -132,6 +139,9 @@ public class MyPullToRefreshView extends LinearLayout {
             currentStatus = RefreshStatus.REFRESHING;
             changeRefreshHeaderViewPaddingToZero();
             handleRefreshStatusChanged();
+            if (mListener != null) {
+                mListener.endRefresh();
+            }
         }
 
         return mWholeHeaderView.getPaddingTop() > minWholeHeaderViewPaddingTop;
@@ -164,8 +174,26 @@ public class MyPullToRefreshView extends LinearLayout {
         valueAnimator.start();
     }
 
+
+    public interface onRefreshEndListener {
+        void endRefresh();
+    }
+
+    private onRefreshEndListener mListener;
+
+    public void setOnRefreshEndListener(onRefreshEndListener mListener) {
+        this.mListener = mListener;
+    }
+
+    public void onRefreshEnd() {
+        hiddenRefreshHeaderView();
+        currentStatus = RefreshStatus.IDLE;
+        mSelfManager.onRefreshEnd();
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mDownY = event.getY();

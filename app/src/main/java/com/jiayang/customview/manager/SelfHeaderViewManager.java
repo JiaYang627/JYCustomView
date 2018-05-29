@@ -83,4 +83,13 @@ public class SelfHeaderViewManager {
         mImageViewAnimation.setVisibility(View.VISIBLE);
         mMImageViewDrawable.start();
     }
+
+    public void onRefreshEnd() {
+        mTextView.setText("下拉刷新");
+        mRotateAnimationForDown.setDuration(0);
+        mImageView.startAnimation(mRotateAnimationForDown);
+        mImageView.setVisibility(View.VISIBLE);
+        mImageViewAnimation.setVisibility(View.GONE);
+
+    }
 }
