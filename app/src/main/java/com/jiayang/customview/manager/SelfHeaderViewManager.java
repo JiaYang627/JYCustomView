@@ -1,11 +1,7 @@
 package com.jiayang.customview.manager;
 
 import android.content.Context;
-import android.graphics.drawable.AnimationDrawable;
 import android.view.View;
-import android.view.animation.RotateAnimation;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 /**
  * @author ：张 奎
@@ -16,12 +12,6 @@ public abstract class SelfHeaderViewManager {
 
     protected Context mContext;
     protected View mSelfHeaderView;
-    private RotateAnimation mRotateAnimationForUp;
-    private RotateAnimation mRotateAnimationForDown;
-    private TextView mTextView;
-    private ImageView mImageView;
-    private ImageView mImageViewAnimation;
-    private AnimationDrawable mMImageViewDrawable;
 
 
 

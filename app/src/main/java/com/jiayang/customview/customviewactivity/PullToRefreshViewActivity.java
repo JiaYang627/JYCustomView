@@ -9,7 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import com.jiayang.customview.R;
 import com.jiayang.customview.adapter.MyAdapter;
 import com.jiayang.customview.customview.MyPullToRefreshView;
-import com.jiayang.customview.manager.NormalSelfHeaderViewManager;
+import com.jiayang.customview.manager.MTSelfHeaderViewManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,8 @@ public class PullToRefreshViewActivity extends AppCompatActivity {
     private void initView() {
         mPullToRefreshView = findViewById(R.id.myPullToRefreshView);
         mRecyclerView = findViewById(R.id.recyclerView);
-        mPullToRefreshView.setSelfManager(new NormalSelfHeaderViewManager(this));
+//        mPullToRefreshView.setSelfManager(new NormalSelfHeaderViewManager(this));
+        mPullToRefreshView.setSelfManager(new MTSelfHeaderViewManager(this));
     }
 
     private void initListener() {
