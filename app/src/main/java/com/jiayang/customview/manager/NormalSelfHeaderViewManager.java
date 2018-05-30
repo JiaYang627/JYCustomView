@@ -84,4 +84,9 @@ public class NormalSelfHeaderViewManager extends SelfHeaderViewManager{
         mImageViewAnimation.setVisibility(View.GONE);
 
     }
+
+    @Override
+    public void handleScale(float scale) {
+
+    }
 }

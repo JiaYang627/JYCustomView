@@ -17,6 +17,8 @@ public class MTSelfHeaderViewManager extends SelfHeaderViewManager {
 
     private ImageView mPullDownImageView;
     private ImageView mReleaseRefresingImageView;
+    private AnimationDrawable mReleaseRefreshDrawable;
+    private AnimationDrawable mRefreshingDrawable;
 
     public MTSelfHeaderViewManager(Context context) {
         this.mContext = context;
@@ -35,6 +37,17 @@ public class MTSelfHeaderViewManager extends SelfHeaderViewManager {
     }
 
     @Override
+    public void changeToIdle() {
+
+        if (mReleaseRefreshDrawable != null) {
+            mReleaseRefreshDrawable.stop();
+        }
+        if (mRefreshingDrawable != null) {
+            mRefreshingDrawable.stop();
+        }
+    }
+
+    @Override
     public void changeToPullDown() {
         mPullDownImageView.setVisibility(View.VISIBLE);
         mReleaseRefresingImageView.setVisibility(View.GONE);
@@ -44,21 +57,27 @@ public class MTSelfHeaderViewManager extends SelfHeaderViewManager {
     public void changeToReleaseRefresh() {
         mPullDownImageView.setVisibility(View.GONE);
         mReleaseRefresingImageView.setImageResource(R.drawable.release_refresh);
-        AnimationDrawable drawable = (AnimationDrawable) mReleaseRefresingImageView.getDrawable();
-        drawable.start();
+        mReleaseRefreshDrawable = (AnimationDrawable) mReleaseRefresingImageView.getDrawable();
+        mReleaseRefreshDrawable.start();
         mReleaseRefresingImageView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void changeToRefreshing() {
         mReleaseRefresingImageView.setImageResource(R.drawable.refresh_mt_refreshing);
-        AnimationDrawable drawable = (AnimationDrawable) mReleaseRefresingImageView.getDrawable();
-        drawable.start();
+        mRefreshingDrawable = (AnimationDrawable) mReleaseRefresingImageView.getDrawable();
+        mRefreshingDrawable.start();
     }
 
     @Override
     public void onRefreshEnd() {
         mPullDownImageView.setVisibility(View.VISIBLE);
         mReleaseRefresingImageView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void handleScale(float scale) {
+        mPullDownImageView.setScaleX(scale);
+        mPullDownImageView.setScaleY(scale);
     }
 }

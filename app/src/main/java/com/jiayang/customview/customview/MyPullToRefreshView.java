@@ -102,9 +102,13 @@ public class MyPullToRefreshView extends LinearLayout {
         if (dY > 0) {
             //阻尼效果:就是类似弹簧的效果,随距离越来越长,拉动越来越难
             int paddingTop = (int) (dY / dragRadio + minWholeHeaderViewPaddingTop);
-            if (paddingTop < 0 && currentStatus != RefreshStatus.PULL_DOWN) {
-                currentStatus = RefreshStatus.PULL_DOWN;
-                handleRefreshStatusChanged();
+            if (paddingTop < 0 ) {
+                if (currentStatus != RefreshStatus.PULL_DOWN) {
+                    currentStatus = RefreshStatus.PULL_DOWN;
+                    handleRefreshStatusChanged();
+                }
+                float scale = 1 - paddingTop * 1.0f / minWholeHeaderViewPaddingTop;
+                mSelfManager.handleScale(scale);
             } else if (paddingTop > 0 && currentStatus != RefreshStatus.RELEASE_REFRESH) {
                 currentStatus = RefreshStatus.RELEASE_REFRESH;
                 handleRefreshStatusChanged();
@@ -201,6 +205,7 @@ public class MyPullToRefreshView extends LinearLayout {
     public void onRefreshEnd() {
         hiddenRefreshHeaderView();
         currentStatus = RefreshStatus.IDLE;
+        handleRefreshStatusChanged();
         mSelfManager.onRefreshEnd();
     }
 

@@ -24,9 +24,7 @@ public abstract class SelfHeaderViewManager {
         return mSelfHeaderView.getMeasuredHeight();
     }
 
-    public void changeToIdle() {
-
-    }
+    public abstract void changeToIdle();
 
     public abstract void changeToPullDown();
 
@@ -35,4 +33,10 @@ public abstract class SelfHeaderViewManager {
     public abstract void changeToRefreshing();
 
     public abstract void onRefreshEnd();
+
+    /**
+     * 处理 动画缩放
+     * @param scale
+     */
+    public abstract void handleScale(float scale);
 }
